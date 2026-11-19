@@ -46,4 +46,12 @@ public class QemuGenieZoneCapabilityTest {
         assertEquals(QemuGenieZoneCapability.Status.QEMU_ABI_MISMATCH,
             QemuGenieZoneCapability.classify(true, true, true, false, false, "Exec format error"));
     }
+
+    @Test
+    public void describeExplainsProvisioningAndAcceleratorFailures() {
+        assertTrue(QemuGenieZoneCapability.describe(
+            QemuGenieZoneCapability.Status.QEMU_BINARY_ABSENT).contains("setup"));
+        assertTrue(QemuGenieZoneCapability.describe(
+            QemuGenieZoneCapability.Status.QEMU_ACCELERATOR_MISSING).contains("gzvm"));
+    }
 }

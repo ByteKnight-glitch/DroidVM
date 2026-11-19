@@ -25,6 +25,26 @@ public final class QemuGenieZoneCapability {
         QEMU_ABI_MISMATCH
     }
 
+    @NonNull
+    public static String describe(@NonNull Status status) {
+        switch (status) {
+            case AVAILABLE:
+                return "available";
+            case DEVICE_NODE_ABSENT:
+                return "/dev/gzvm is missing";
+            case DEVICE_NODE_INACCESSIBLE:
+                return "/dev/gzvm exists but is not readable";
+            case QEMU_BINARY_ABSENT:
+                return "QEMU is not installed; run the setup extraction step";
+            case QEMU_ACCELERATOR_MISSING:
+                return "installed QEMU does not advertise the gzvm accelerator";
+            case QEMU_ABI_MISMATCH:
+                return "installed QEMU cannot execute on this device ABI";
+            default:
+                throw new AssertionError(status);
+        }
+    }
+
     public static boolean acceleratorIsAvailable(@NonNull String acceleratorHelp) {
         for (var line : acceleratorHelp.toLowerCase().split("\\R")) {
             var token = line.trim();

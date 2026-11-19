@@ -408,7 +408,7 @@ public final class VMEditBasicTab extends VMEditBaseTab {
             if (status != QemuGenieZoneCapability.Status.AVAILABLE)
                 return showValidateFailed(parent.getString(
                     R.string.create_vm_error_qemu_geniezone_unavailable,
-                    status.name()));
+                    QemuGenieZoneCapability.describe(status)));
         }
         return true;
     }

@@ -181,7 +181,8 @@ public final class QemuBackendInstance extends VMBackendInstance {
                 var gzvmStatus = QemuGenieZoneCapability.diagnose();
                 if (gzvmStatus != QemuGenieZoneCapability.Status.AVAILABLE)
                     throw new RuntimeException(
-                        "QEMU-GZVM accelerator is unavailable: " + gzvmStatus.name());
+                        "QEMU-GZVM accelerator is unavailable: "
+                            + QemuGenieZoneCapability.describe(gzvmStatus));
                 args.add("gzvm");
                 break;
             case SOFT:
