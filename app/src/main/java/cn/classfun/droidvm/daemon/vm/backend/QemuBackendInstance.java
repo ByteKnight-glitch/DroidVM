@@ -178,9 +178,10 @@ public final class QemuBackendInstance extends VMBackendInstance {
                 defProtectedMode = ProtectedVM.PROTECTED_WITHOUT_FIRMWARE;
                 break;
             case GENIEZONE:
-                if (!QemuGenieZoneCapability.isAvailable())
+                var gzvmStatus = QemuGenieZoneCapability.diagnose();
+                if (gzvmStatus != QemuGenieZoneCapability.Status.AVAILABLE)
                     throw new RuntimeException(
-                        "QEMU-GZVM accelerator is unavailable: /dev/gzvm and gzvm in -accel help are required");
+                        "QEMU-GZVM accelerator is unavailable: " + gzvmStatus.name());
                 args.add("gzvm");
                 break;
             case SOFT:

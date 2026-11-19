@@ -403,10 +403,13 @@ public final class VMEditBasicTab extends VMEditBaseTab {
         VMHypervisor hypervisor = chooseHypervisor.getSelectedItem();
         if (!VMHypervisor.isBackendSupported(backend, hypervisor))
             return showValidateFailed(R.string.create_vm_error_hypervisor_not_supported);
-        if (backend == VMBackend.QEMU
-            && hypervisor == VMHypervisor.GENIEZONE
-            && !QemuGenieZoneCapability.isAvailable())
-            return showValidateFailed(R.string.create_vm_error_qemu_geniezone_unavailable);
+        if (backend == VMBackend.QEMU && hypervisor == VMHypervisor.GENIEZONE) {
+            var status = QemuGenieZoneCapability.diagnose();
+            if (status != QemuGenieZoneCapability.Status.AVAILABLE)
+                return showValidateFailed(parent.getString(
+                    R.string.create_vm_error_qemu_geniezone_unavailable,
+                    status.name()));
+        }
         return true;
     }
 

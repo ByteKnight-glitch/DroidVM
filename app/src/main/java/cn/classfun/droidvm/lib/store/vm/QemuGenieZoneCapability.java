@@ -16,6 +16,15 @@ public final class QemuGenieZoneCapability {
     private QemuGenieZoneCapability() {
     }
 
+    public enum Status {
+        AVAILABLE,
+        DEVICE_NODE_ABSENT,
+        DEVICE_NODE_INACCESSIBLE,
+        QEMU_BINARY_ABSENT,
+        QEMU_ACCELERATOR_MISSING,
+        QEMU_ABI_MISMATCH
+    }
+
     public static boolean acceleratorIsAvailable(@NonNull String acceleratorHelp) {
         for (var line : acceleratorHelp.toLowerCase().split("\\R")) {
             var token = line.trim();
@@ -30,16 +39,49 @@ public final class QemuGenieZoneCapability {
         return deviceExists && acceleratorExists;
     }
 
+    public static Status classify(
+        boolean deviceExists,
+        boolean deviceAccessible,
+        boolean binaryExists,
+        boolean commandSucceeded,
+        boolean acceleratorExists,
+        @NonNull String commandOutput
+    ) {
+        if (!deviceExists) return Status.DEVICE_NODE_ABSENT;
+        if (!deviceAccessible) return Status.DEVICE_NODE_INACCESSIBLE;
+        if (!binaryExists) return Status.QEMU_BINARY_ABSENT;
+        if (!commandSucceeded) {
+            var output = commandOutput.toLowerCase();
+            if (output.contains("exec format")
+                || output.contains("bad elf")
+                || output.contains("wrong architecture")
+                || output.contains("not executable")) return Status.QEMU_ABI_MISMATCH;
+            return Status.QEMU_ACCELERATOR_MISSING;
+        }
+        return acceleratorExists ? Status.AVAILABLE : Status.QEMU_ACCELERATOR_MISSING;
+    }
+
     public static boolean isAvailable() {
-        if (!shellCheckExists(DEVICE)) return false;
+        return diagnose() == Status.AVAILABLE;
+    }
+
+    @NonNull
+    public static Status diagnose() {
+        boolean deviceExists = shellCheckExists(DEVICE);
+        if (!deviceExists) return Status.DEVICE_NODE_ABSENT;
+        boolean deviceAccessible = runListQuiet("test", "-r", DEVICE).isSuccess();
         var binary = getPrebuiltBinaryPath("qemu-system-aarch64");
-        if (!shellCheckExists(binary)) return false;
+        boolean binaryExists = shellCheckExists(binary);
+        if (!binaryExists)
+            return classify(true, deviceAccessible, false, false, false, "");
         try {
             var result = runListQuiet(binary, "-accel", "help");
             var help = result.getOutString() + "\n" + result.getErrString();
-            return result.isSuccess() && preflight(true, acceleratorIsAvailable(help));
+            return classify(
+                true, deviceAccessible, true, result.isSuccess(),
+                acceleratorIsAvailable(help), help);
         } catch (Throwable t) {
-            return false;
+            return classify(true, deviceAccessible, true, false, false, t.toString());
         }
     }
 }
