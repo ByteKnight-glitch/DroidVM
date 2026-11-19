@@ -406,7 +406,7 @@ public final class VMEditBasicTab extends VMEditBaseTab {
         if (backend == VMBackend.QEMU
             && hypervisor == VMHypervisor.GENIEZONE
             && !QemuGenieZoneCapability.isAvailable())
-            return showValidateFailed(R.string.create_vm_error_hypervisor_not_supported);
+            return showValidateFailed(R.string.create_vm_error_qemu_geniezone_unavailable);
         return true;
     }
 

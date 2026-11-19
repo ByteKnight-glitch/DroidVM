@@ -194,6 +194,7 @@
     <string name="create_vm_error_gpu_guest_dynamic_requires_room">Guest preallocation must be smaller than the guest pool when the step is enabled</string>
     <string name="create_vm_error_gpu_guest_step_invalid">Guest step must be 0 or a power of two of at least 2 MB</string>
     <string name="create_vm_error_hypervisor_not_supported">Selected hypervisor is not supported by selected backend</string>
+    <string name="create_vm_error_qemu_geniezone_unavailable">QEMU GenieZone is unavailable: this device needs /dev/gzvm and a QEMU binary with gzvm accelerator support</string>
     <string name="create_vm_error_path_invalid">Invalid absolute path</string>
     <string name="create_vm_error_native_display_only_crosvm">Native display only applies to CrosVM backend.</string>
     <string name="create_vm_category_kernel">Linux Kernel</string>
